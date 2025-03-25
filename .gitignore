@@ -1,0 +1,6 @@
+*.o
+*.out
+*.a
+*.dSYM/
+.DS_Store
+minitalk
