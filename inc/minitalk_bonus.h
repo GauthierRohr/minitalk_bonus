@@ -6,7 +6,7 @@
 /*   By: grohr <grohr@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 15:08:12 by grohr             #+#    #+#             */
-/*   Updated: 2025/03/25 17:43:17 by grohr            ###   ########.fr       */
+/*   Updated: 2025/03/26 20:53:56 by grohr            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,5 +28,7 @@
 # include "../libft/libft.h"
 # include "../libft/ft_printf/ft_printf.h"
 # include <signal.h> // SIGUSR1, SIGUSR2, kill()
+# include <unistd.h>
+# include <stdlib.h>
 
 #endif

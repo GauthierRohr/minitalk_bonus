@@ -5,56 +5,84 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: grohr <grohr@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/25 15:17:16 by grohr             #+#    #+#             */
-/*   Updated: 2025/03/25 18:08:29 by grohr            ###   ########.fr       */
+/*   Created: 2025/03/26 17:28:03 by grohr             #+#    #+#             */
+/*   Updated: 2025/03/26 21:06:39 by grohr            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minitalk.h"
 
-// Fonction de gestion des signaux
-//bit : Compteur de bits reçus (persistant entre les appels)
-//c_created : Caractère en cours de construction (persistant entre les appels)
-//c_created |= (0x01 << bit) : si SIGUSR1 reçu, on met le bit correspondant à 1
-//(bit == 8) : Si on a reçu 8 bits (un caractère complet)
-void	ft_handler(int signal)
-{
-	static int	bit;
-	static int	c_created;
+char	*g_msg = NULL;
 
-	if (signal == SIGUSR1)
-		c_created |= (0x01 << bit);
-	bit++;
-	if (bit == 8)
+// Calculer la longueur actuelle du message
+// Allouer un nouveau buffer (+2 pour le nouveau char et le '\0')
+// Copier l'ancien message si existant
+// Ajouter le nouveau caractère
+// Mettre à jour le pointeur global
+void	add_char(char c)
+{
+	char	*new;
+	size_t	len;
+
+	if (g_msg)
+		len = ft_strlen(g_msg);
+	else
+		len = 0;
+	new = malloc(len + 2);
+	if (!new)
+		exit(1);
+	if (g_msg)
 	{
-		ft_printf("%c", c_created);
-		bit = 0;
-		c_created = 0;
+		ft_memcpy(new, g_msg, len);
+		free(g_msg);
+	}
+	new[len] = c;
+	new[len + 1] = '\0';
+	g_msg = new;
+}
+
+// Signal handler function
+void	handler(int signal, siginfo_t *sig_info, void *context)
+{
+	static int	bit_index = 0;
+	static char	c = 0;
+
+	(void)context;
+	(void)sig_info;
+	if (signal == SIGUSR2)
+		c |= (1 << bit_index);
+	bit_index++;
+	if (bit_index == 8)
+	{
+		if (c == '\0')
+		{
+			ft_printf("%s\n", g_msg);
+			free(g_msg);
+			g_msg = NULL;
+		}
+		else
+			add_char(c);
+		bit_index = 0;
+		c = 0;
 	}
 }
 
-//(void)argv : Pour éviter un warning de variable non utilisée
-//while (argc == 1)	: Boucle infinie tant que le programme n'est pas interrompu
-//pause() : On met le processus en pause jusqu'à réception d'un signal
 int	main(int argc, char **argv)
 {
-	int	pid;
+	struct sigaction	sa;
 
-	(void)argv;
 	if (argc != 1)
 	{
-		ft_printf("\033[91mError: wrong format.\033[0m\n");
-		ft_printf("\033[33mTry: ./server\033[0m\n");
-		return (0);
+		ft_printf("\033[38;5;196mError: wrong format.\033[0m\n");
+		return (ft_printf("\033[33mUsage: %s\033[0m\n", argv[0]), 0);
 	}
-	pid = getpid();
-	ft_printf("\033[94mPID\033[0m \033[96m->\033[0m %d\n", pid);
-	ft_printf("\033[90mWaiting for a message...\033[0m\n");
-	while (argc == 1)
-	{
-		signal(SIGUSR1, ft_handler);
-		signal(SIGUSR2, ft_handler);
+	sa.sa_sigaction = &handler;
+	sa.sa_flags = SA_SIGINFO;
+	sigaction(SIGUSR1, &sa, NULL);
+	sigaction(SIGUSR2, &sa, NULL);
+	ft_printf("\033[94mPID -> \033[0m%d\n", getpid());
+	ft_printf("\033[90mWaiting...\033[0m\n");
+	while (1)
 		pause();
-	}
 	return (0);
 }
