@@ -6,7 +6,7 @@
 /*   By: grohr <grohr@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:28:03 by grohr             #+#    #+#             */
-/*   Updated: 2025/03/26 21:06:59 by grohr            ###   ########.fr       */
+/*   Updated: 2025/03/28 18:29:15 by grohr            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,11 +115,11 @@ void	handler(int signal, siginfo_t *sig_info, void *context)
 // 		La fonction de gestion du signal (handler)
 // 		Les drapeaux de comportement (SA_SIGINFO)
 // 		Le masque de signaux à bloquer pendant le traitement
-// &sa indique au système :
+// sigaction indique au système :
 // 		Comment réagir quand SIGUSR1 est reçu
 // 		Quelle fonction appeler
 // 		Avec quelles options spéciales
-// Le troisième argument NULL signifie :
+// 	==> Le troisième argument NULL signifie :
 // 		Ne pas sauvegarder l'ancienne configuration de signal
 // 		Remplacer directement le comportement précédent
 int	main(int argc, char **argv)
@@ -131,6 +131,7 @@ int	main(int argc, char **argv)
 		ft_printf("\033[38;5;196mError: wrong format.\033[0m\n");
 		return (ft_printf("\033[33mUsage: %s\033[0m\n", argv[0]), 0);
 	}
+	ft_memset(&sa, '\0', sizeof(struct sigaction));
 	sa.sa_sigaction = &handler;
 	sa.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &sa, NULL);

@@ -6,7 +6,7 @@
 /*   By: grohr <grohr@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:28:03 by grohr             #+#    #+#             */
-/*   Updated: 2025/03/26 21:06:39 by grohr            ###   ########.fr       */
+/*   Updated: 2025/03/28 18:28:57 by grohr            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,7 @@ int	main(int argc, char **argv)
 		ft_printf("\033[38;5;196mError: wrong format.\033[0m\n");
 		return (ft_printf("\033[33mUsage: %s\033[0m\n", argv[0]), 0);
 	}
+	ft_memset(&sa, '\0', sizeof(struct sigaction));
 	sa.sa_sigaction = &handler;
 	sa.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &sa, NULL);
